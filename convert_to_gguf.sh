@@ -34,12 +34,10 @@ fail() { echo -e "${RED}✗${NC}  $1"; exit 1; }
 step() { echo -e "\n${YELLOW}▶${NC}  $1"; }
 
 echo ""
-echo "╔══════════════════════════════════════════════╗"
-echo "║   🔧  GGUF Conversion                       ║"
-echo "╚══════════════════════════════════════════════╝"
+echo " GGUF Conversion "
 echo ""
 
-# ── check inputs ──────────────────────────────────────────────────────────────
+# ── check inputs ────────────────────────────
 step "Checking for the HuggingFace model"
 
 MODEL_DIR="./finetuned_model"
@@ -54,7 +52,7 @@ if [ -z "$WEIGHTS" ]; then
 fi
 ok "Found model weights in $MODEL_DIR"
 
-# ── install llama.cpp ─────────────────────────────────────────────────────────
+# ── install llama.cpp ──────
 step "Setting up llama.cpp"
 
 LLAMACPP_DIR="./llama.cpp"
@@ -69,7 +67,7 @@ fi
 # build the converter (the Python scripts don't need cmake, they're just Python)
 ok "llama.cpp ready"
 
-# ── install Python requirements for conversion ─────────────────────────────
+# ── install Python requirements for conversion ───────────────
 step "Installing conversion dependencies"
 
 # fix the protobuf version that was causing issues in the notebook
@@ -77,7 +75,7 @@ pip install -q "protobuf>=3.20.3" sentencepiece transformers
 
 ok "Dependencies installed"
 
-# ── convert to F16 GGUF ───────────────────────────────────────────────────────
+# ── convert to F16 GGUF ────────────────
 step "Converting to GGUF (F16 — full precision, ~7GB)"
 
 F16_OUT="$MODEL_DIR/model_f16.gguf"
@@ -89,7 +87,7 @@ python "$LLAMACPP_DIR/convert_hf_to_gguf.py" \
 
 ok "F16 conversion done: $F16_OUT"
 
-# ── quantize to Q4_K_M ────────────────────────────────────────────────────────
+# ── quantize to Q4_K_M ────────────────
 step "Quantizing to Q4_K_M (~4GB, good quality/size tradeoff)"
 
 # build the quantize binary if we haven't yet
@@ -120,7 +118,7 @@ Q4_OUT="$MODEL_DIR/unsloth.Q4_K_M.gguf"
 
 ok "Quantization done: $Q4_OUT"
 
-# ── cleanup ───────────────────────────────────────────────────────────────────
+# ── cleanup ──────────────────
 step "Cleaning up"
 
 # remove the big F16 file since we have the quantized version
@@ -131,9 +129,7 @@ fi
 
 # ── done ──────────────────────────────────────────────────────────────────────
 echo ""
-echo "╔══════════════════════════════════════════════╗"
-echo "║   ✅  Conversion complete!                  ║"
-echo "╚══════════════════════════════════════════════╝"
+echo "║  Conversion complete!  "
 echo ""
 echo "  Output: $Q4_OUT"
 echo ""
